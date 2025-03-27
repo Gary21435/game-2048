@@ -141,12 +141,15 @@ function handleKey(key) {
         }
     }
     let index; 
-    do {
-        index = getRandomCell();
+    // enter while only if there is at least one empty cell
+    if((arr[0].includes(0) || arr[1].includes(0) || arr[2].includes(0) || arr[3].includes(0))) {
+        do {
+            index = getRandomCell();
+        }
+        while(arr[Math.floor(index/4)][index%4] !== 0);
+
+        arr[Math.floor(index/4)][index%4] = 2;
     }
-    while(arr[Math.floor(index/4)][index%4] !== 0);
-    
-    arr[Math.floor(index/4)][index%4] = 2;
     updateGrid();
 }
 
@@ -154,7 +157,11 @@ document.addEventListener("click", (e) => {
     //if (e.target.className === "square") e.target.classList.add("two");
 });
 
-document.addEventListener("keydown", (key) => handleKey(key.key));
+let keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
+
+document.addEventListener("keydown", (key) => {
+    if(keys.includes(key.key)) handleKey(key.key);
+});
 
 
 
