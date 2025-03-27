@@ -1,5 +1,5 @@
 const gridSize = 600;
-
+const keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
 const grid = document.querySelector(".container");
 
 grid.style.width = `${gridSize}px`;
@@ -9,10 +9,10 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
+    [8, 2, 16, 2],
+    [16, 4, 8, 256],
+    [4, 64, 16, 2],
+    [2, 8, 2, 64],
 ];
 
 
@@ -77,6 +77,9 @@ for (let i = 0; i < 16; i++) {
     square.style.height = `${squareSize}px`;
     square.style.boxSizing = "border-box";
 
+
+    //square.textContent = arr[Math.floor(i/4)][i%4];
+
     if(i === i1 || i === i2) {
         square.textContent = 2; //arr[Math.floor(i/4)][i%4];
         arr[Math.floor(i/4)][i%4] = 2;
@@ -105,43 +108,69 @@ function mirrorRow(arr) {
     return ans;
 }
 
-function handleKey(key) {
+function computeRowBasedOnKey(key, array) {
+    let same = true;
     if(key === "ArrowRight") {
         for(let i = 0; i < 4; i++) {
-            arr[i] = computeRow(arr[i])
+            let temp = computeRow(array[i]);
+            // check for each row being the same
+            if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
+            array[i] = temp;
         }
     }
     else if(key === "ArrowLeft") {
         for(let i = 0; i < 4; i++) {
-            arr[i] = mirrorRow(computeRow(mirrorRow(arr[i])));
+            let temp = mirrorRow(computeRow(mirrorRow(array[i])));
+            if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
+            array[i] = temp;
         }   
     }
     else if(key === "ArrowUp") {
         for(let i = 0; i < 4; i++) {
             let upArr = [];
             for(let x = 0; x < 4; x++) {
-                upArr.unshift(arr[x][i]);
+                upArr.unshift(array[x][i]);
             }
+            let temp = upArr;
+            let comp = [];
             upArr = computeRow(upArr);
             for(let x = 0; x < 4; x++) {
-                arr[x][i] = upArr[-1*(x-3)];
+                array[x][i] = upArr[-1*(x-3)];
+                comp.unshift(array[x][i]);
             }
+            if(JSON.stringify(temp) !== JSON.stringify(comp)) same = false;
         }
     }
     else if(key === "ArrowDown") {
         for(let i = 0; i < 4; i++) {
             let upArr = [];
             for(let x = 0; x < 4; x++) {
-                upArr.push(arr[x][i]);
+                upArr.push(array[x][i]);
             }
+            let temp = upArr;
+            let comp = [];
             upArr = computeRow(upArr);
             for(let x = 0; x < 4; x++) {
-                arr[x][i] = upArr[x];
+                array[x][i] = upArr[x];
+                comp.push(array[x][i]);
             }
+            if(JSON.stringify(temp) !== JSON.stringify(comp)) same = false;
         }
     }
+    return same;
+}
+
+function handleKey(key) {
+    computeRowBasedOnKey(key, arr);
     let index; 
-    // enter while only if there is at least one empty cell
+    let arr_copy = new Array(4);
+    // for(let i = 0; i < 4; i++) {
+    //     arr_copy[i] = arr[i];
+    // }
+    // console.log(arr_copy);
+
+    let same = [false, false, false, false];
+    // add a new 2 only if there is at least one empty cell
     if((arr[0].includes(0) || arr[1].includes(0) || arr[2].includes(0) || arr[3].includes(0))) {
         do {
             index = getRandomCell();
@@ -150,6 +179,20 @@ function handleKey(key) {
 
         arr[Math.floor(index/4)][index%4] = 2;
     }
+    // Check for game over
+    else {
+        for(let i = 0; i < 4; i++) {
+            arr_copy[i] = arr[i];
+        }
+        let i = 0;
+        keys.forEach((k) => {
+            console.log("entered");
+            same[i] = computeRowBasedOnKey(k, arr_copy);
+            i++;
+        });
+        if(same.every(bool => bool === true)) console.log("GAME OVER.");
+    }
+
     updateGrid();
 }
 
@@ -157,7 +200,7 @@ document.addEventListener("click", (e) => {
     //if (e.target.className === "square") e.target.classList.add("two");
 });
 
-let keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
+
 
 document.addEventListener("keydown", (key) => {
     if(keys.includes(key.key)) handleKey(key.key);
