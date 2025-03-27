@@ -1,6 +1,7 @@
 const gridSize = 600;
 const keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
 const grid = document.querySelector(".container");
+const btn = document.querySelector(".btn");
 
 grid.style.width = `${gridSize}px`;
 grid.style.height = `${gridSize}px`;
@@ -16,13 +17,13 @@ const arr = [
 ];
 
 
-let ar = [1, 2, 3, 0];
-// console.log(ar);
-// console.log("last: ", ar.at(-1));
-// ar.splice(0, 0, 0)
-// console.log("hello", ar.slice(0, -1));
+// let ar = [1, 2, 3, 0];
+// // console.log(ar);
+// // console.log("last: ", ar.at(-1));
+// // ar.splice(0, 0, 0)
+// // console.log("hello", ar.slice(0, -1));
 
-ar = [4, 4, 4, 0]; // actual: [2, 2, 0, 2]
+// ar = [4, 4, 4, 0]; // actual: [2, 2, 0, 2]
 function computeRow(row) {
     if(row.length === 1) return row; // stop condition
 
@@ -65,29 +66,56 @@ let i2;
 while(i1 === (i2 = getRandomCell()));
 console.log(i2);
 
-// Make and populate grid based on 'arr'
-for (let i = 0; i < 16; i++) {
-    const square = document.createElement("div");
-    grid.appendChild(square);
-
-    let squareSize = gridSize / 4.4;
-    square.classList.add("square");
-    square.id = "sq" + String(i);
-    square.style.width = `${squareSize}px`;
-    square.style.height = `${squareSize}px`;
-    square.style.boxSizing = "border-box";
-
-
-    //square.textContent = arr[Math.floor(i/4)][i%4];
-
-    if(i === i1 || i === i2) {
-        square.textContent = 2; //arr[Math.floor(i/4)][i%4];
-        arr[Math.floor(i/4)][i%4] = 2;
+// Make and populate grid; insert two
+function populateGrid() {
+    for (let i = 0; i < 16; i++) {
+        const square = document.createElement("div");
+        grid.appendChild(square);
+    
+        let squareSize = gridSize / 4.4;
+        square.classList.add("square");
+        square.id = "sq" + String(i);
+        square.style.width = `${squareSize}px`;
+        square.style.height = `${squareSize}px`;
+        square.style.boxSizing = "border-box";
+    
+        // To populate based on arr:
+        //square.textContent = arr[Math.floor(i/4)][i%4];
+    
+        if(i === i1 || i === i2) {
+            square.textContent = 2; //arr[Math.floor(i/4)][i%4];
+            arr[Math.floor(i/4)][i%4] = 2;
+        }
+        else {
+            square.textContent = 0;
+            arr[Math.floor(i/4)][i%4] = 0;
+        }
     }
-    else {
-        square.textContent = 0;
-        arr[Math.floor(i/4)][i%4] = 0;
-    }
+}
+
+populateGrid();
+
+function startOver() {
+    let i1 = getRandomCell();
+    console.log(i1);
+    let i2;
+    while(i1 === (i2 = getRandomCell()));
+    console.log(i2);
+    
+    // Select all cells
+    const allCells = document.querySelectorAll(".container>div");
+    let i = 0;
+    allCells.forEach(e => {
+        if(i === i1 || i === i2) {
+            e.textContent = 2; //arr[Math.floor(i/4)][i%4];
+            arr[Math.floor(i/4)][i%4] = 2;
+        }
+        else {
+            e.textContent = 0;
+            arr[Math.floor(i/4)][i%4] = 0;
+        }
+        i++;
+    })
 }
 
 function updateGrid() {
@@ -190,9 +218,13 @@ function handleKey(key) {
             same[i] = computeRowBasedOnKey(k, arr_copy);
             i++;
         });
-        if(same.every(bool => bool === true)) console.log("GAME OVER.");
+        if(same.every(bool => bool === true)) { // GAME OVER
+            console.log("game over");
+            // const button = document.createElement("button");
+            // btn.appendChild(button);
+            // button.textContent = "Start Over";
+        }
     }
-
     updateGrid();
 }
 
@@ -206,6 +238,10 @@ document.addEventListener("keydown", (key) => {
     if(keys.includes(key.key)) handleKey(key.key);
 });
 
+document.addEventListener("click", (e) => {
+    if(e.target.classList.contains("new-game"))
+        startOver();
+});
 
 
 //OLD IMPLEMENTATION (doesn't work)
