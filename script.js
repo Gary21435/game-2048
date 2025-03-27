@@ -9,10 +9,10 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [2, 0, 0, 0],
-    [2, 2, 0, 0],
-    [2, 2, 2, 0],
-    [2, 2, 2, 2],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
 ];
 
 
@@ -55,6 +55,15 @@ function computeRow(row) {
     return ans;
 }
 
+function getRandomCell() {
+    return Math.floor(Math.random()*16);
+}
+
+let i1 = getRandomCell();
+console.log(i1);
+let i2;
+while(i1 === (i2 = getRandomCell()));
+console.log(i2);
 
 // Make and populate grid based on 'arr'
 for (let i = 0; i < 16; i++) {
@@ -68,7 +77,14 @@ for (let i = 0; i < 16; i++) {
     square.style.height = `${squareSize}px`;
     square.style.boxSizing = "border-box";
 
-    square.textContent = arr[Math.floor(i/4)][i%4];
+    if(i === i1 || i === i2) {
+        square.textContent = 2; //arr[Math.floor(i/4)][i%4];
+        arr[Math.floor(i/4)][i%4] = 2;
+    }
+    else {
+        square.textContent = 0;
+        arr[Math.floor(i/4)][i%4] = 0;
+    }
 }
 
 function updateGrid() {
@@ -124,6 +140,13 @@ function handleKey(key) {
             }
         }
     }
+    let index; 
+    do {
+        index = getRandomCell();
+    }
+    while(arr[Math.floor(index/4)][index%4] !== 0);
+    
+    arr[Math.floor(index/4)][index%4] = 2;
     updateGrid();
 }
 
