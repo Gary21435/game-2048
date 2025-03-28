@@ -5,6 +5,14 @@ const btn = document.querySelector(".btn");
 const gameOver = document.querySelector(".game-over");
 let over = false;
 
+const backgroundColors = ["#CCC1B4", "#eee4da", "#ede0c8", "#f2b179", "#f59563", "#f67c5f", 
+                "#f65e3b", "#edcf72", "#edcc61", "#edc850", "#edc850", "#edc850"];
+
+
+
+const emptybackground = "#CCC1B4";
+const sixteenColor = "#f9f6f2";
+
 grid.style.width = `${gridSize}px`;
 grid.style.height = `${gridSize}px`;
 
@@ -109,6 +117,7 @@ function populateGrid() {
         if(i === i1 || i === i2) {
             square.textContent = 2; //arr[Math.floor(i/4)][i%4];
             arr[Math.floor(i/4)][i%4] = 2;
+            square.style.backgroundColor = backgroundColors[1];
         }
         else {
             square.textContent = 0;
@@ -147,7 +156,17 @@ function updateGrid() {
     let i = 0;
     while(i < 16) {
         let square = document.querySelector(`#sq${String(i)}`)
-        square.textContent = arr[Math.floor(i/4)][i%4];
+        let numSq = arr[Math.floor(i/4)][i%4];
+        square.textContent = numSq;
+        if(numSq === 0) {
+            square.style.backgroundColor = backgroundColors[0];
+            square.style.color = "#4e453e";
+        }
+        else {
+            if(numSq > 4) square.style.color = "white";
+            else square.style.color = "#4e453e"
+            square.style.backgroundColor = backgroundColors[(Math.log(numSq) / Math.log(2))];
+        }
         i++;
     }
 }
