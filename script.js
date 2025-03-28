@@ -19,6 +19,24 @@ const arr = [
 ];
 
 
+function displayMessage(msg) { // SMTH EXTRA HAPPENS WHEN YOU HIT NEW GAME AFTER WINNING
+    const rect = grid.getBoundingClientRect();
+            // console.log("rect.top: ", rect.top);
+            // console.log("rect.width: ", rect.width);
+            
+    const overlay = document.createElement("div");
+            overlay.textContent = msg;
+            overlay.classList.add("overlay");
+            overlay.setAttribute("style", `
+                position:absolute; 
+                top: ${rect.top}px; 
+                left: ${rect.left}px; 
+                width: ${rect.width}px;
+                height: ${rect.height}px    
+            `);
+            document.body.appendChild(overlay);
+}
+
 // let ar = [1, 2, 3, 0];
 // // console.log(ar);
 // // console.log("last: ", ar.at(-1));
@@ -47,6 +65,10 @@ function computeRow(row) {
     let last = row.at(-1);
     if(last === rowOneLess.at(-1) && last !== 0) {
         last *= 2;
+        if(last === 2048) {
+            displayMessage("You Won!");
+            over = true;
+        }
         rowOneLess.unshift(0);
         rowOneLess[rowOneLess.length-1] = last;
         row = rowOneLess;
@@ -82,16 +104,16 @@ function populateGrid() {
         square.style.boxSizing = "border-box";
     
         // To populate based on arr:
-        square.textContent = arr[Math.floor(i/4)][i%4];
+        // square.textContent = arr[Math.floor(i/4)][i%4];
     
-        // if(i === i1 || i === i2) {
-        //     square.textContent = 2; //arr[Math.floor(i/4)][i%4];
-        //     arr[Math.floor(i/4)][i%4] = 2;
-        // }
-        // else {
-        //     square.textContent = 0;
-        //     arr[Math.floor(i/4)][i%4] = 0;
-        // }
+        if(i === i1 || i === i2) {
+            square.textContent = 2; //arr[Math.floor(i/4)][i%4];
+            arr[Math.floor(i/4)][i%4] = 2;
+        }
+        else {
+            square.textContent = 0;
+            arr[Math.floor(i/4)][i%4] = 0;
+        }
     }
 }
 
@@ -226,21 +248,8 @@ function handleKey(key) {
             // const button = document.createElement("button");
             // btn.appendChild(button);
             // button.textContent = "Start Over";
-            const rect = grid.getBoundingClientRect();
-            console.log("rect.top: ", rect.top);
-            console.log("rect.width: ", rect.width);
-
-            const overlay = document.createElement("div");
-            overlay.textContent = "Game Over";
-            overlay.classList.add("overlay");
-            overlay.setAttribute("style", `
-                position:absolute; 
-                top: ${rect.top}px; 
-                left: ${rect.left}px; 
-                width: ${rect.width}px;
-                height: ${rect.height}px    
-            `);
-            document.body.appendChild(overlay);
+            
+            displayMessage("Game Over!");
             over = true;
         }
     }
@@ -254,7 +263,7 @@ document.addEventListener("click", (e) => {
 
 
 document.addEventListener("keydown", (key) => {
-    if(keys.includes(key.key)) handleKey(key.key);
+    if(keys.includes(key.key) && !over) handleKey(key.key);
 });
 
 document.addEventListener("click", (e) => {
