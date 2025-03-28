@@ -12,7 +12,7 @@
 body {
     background-color: antiquewhite;
     height: 100vh;
-
+    
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -83,4 +83,16 @@ h1 {
 
 .two {
     background-color: antiquewhite;
+}
+
+.overlay {
+    align-content: center;
+    text-align: center;
+    font-size: 80px;
+    color: var(--text-color);
+    
+    border-radius: 10px;
+
+    position: absolute;
+    background-color: rgba(245, 245, 245, 0.516);
 }

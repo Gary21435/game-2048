@@ -2,6 +2,8 @@ const gridSize = 600;
 const keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
 const grid = document.querySelector(".container");
 const btn = document.querySelector(".btn");
+const gameOver = document.querySelector(".game-over");
+let over = false;
 
 grid.style.width = `${gridSize}px`;
 grid.style.height = `${gridSize}px`;
@@ -12,7 +14,7 @@ grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}p
 const arr = [
     [8, 2, 16, 2],
     [16, 4, 8, 256],
-    [4, 64, 16, 2],
+    [4, 64, 8, 2],
     [2, 8, 2, 64],
 ];
 
@@ -80,22 +82,23 @@ function populateGrid() {
         square.style.boxSizing = "border-box";
     
         // To populate based on arr:
-        //square.textContent = arr[Math.floor(i/4)][i%4];
+        square.textContent = arr[Math.floor(i/4)][i%4];
     
-        if(i === i1 || i === i2) {
-            square.textContent = 2; //arr[Math.floor(i/4)][i%4];
-            arr[Math.floor(i/4)][i%4] = 2;
-        }
-        else {
-            square.textContent = 0;
-            arr[Math.floor(i/4)][i%4] = 0;
-        }
+        // if(i === i1 || i === i2) {
+        //     square.textContent = 2; //arr[Math.floor(i/4)][i%4];
+        //     arr[Math.floor(i/4)][i%4] = 2;
+        // }
+        // else {
+        //     square.textContent = 0;
+        //     arr[Math.floor(i/4)][i%4] = 0;
+        // }
     }
 }
 
 populateGrid();
 
 function startOver() {
+    over = false;
     let i1 = getRandomCell();
     console.log(i1);
     let i2;
@@ -218,11 +221,27 @@ function handleKey(key) {
             same[i] = computeRowBasedOnKey(k, arr_copy);
             i++;
         });
-        if(same.every(bool => bool === true)) { // GAME OVER
+        if(same.every(bool => bool === true && !over)) { // GAME OVER
             console.log("game over");
             // const button = document.createElement("button");
             // btn.appendChild(button);
             // button.textContent = "Start Over";
+            const rect = grid.getBoundingClientRect();
+            console.log("rect.top: ", rect.top);
+            console.log("rect.width: ", rect.width);
+
+            const overlay = document.createElement("div");
+            overlay.textContent = "Game Over";
+            overlay.classList.add("overlay");
+            overlay.setAttribute("style", `
+                position:absolute; 
+                top: ${rect.top}px; 
+                left: ${rect.left}px; 
+                width: ${rect.width}px;
+                height: ${rect.height}px    
+            `);
+            document.body.appendChild(overlay);
+            over = true;
         }
     }
     updateGrid();
