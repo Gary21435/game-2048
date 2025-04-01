@@ -22,13 +22,25 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [2, 4, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2]
 ];
 
-const cells = [];
+const cells = [
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null]
+];
+
+const cells2 = [
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null]
+];
 let mov = [0, 0, 0];
 
 let c1, c2;
@@ -77,7 +89,7 @@ function computeRow(row, whichTime, direction) {
         row.unshift(0);
         i--;
 
-        for(let g = 0; g < 3-c1; g++)
+        for(let g = 0; g < 3-whichComputeRow-c1; g++)
             mov[g]++;
 
         c1++;
@@ -98,12 +110,12 @@ function computeRow(row, whichTime, direction) {
         rowOneLess.pop();   
         rowOneLess.unshift(0);
         i--;
+
+        for(let h = 0; h < 3-whichComputeRow-c1-c2; h++) {
+            mov[h]++;
+        }
         c2++;
     }
-    if(c2 > 0)
-        for(let h = 0; h < 3-whichComputeRow-c1; h++) {
-            mov[h] += Math.max(c2 - j, 1);
-        }
 
     let last = row.at(-1);
     if(last === rowOneLess.at(-1) && last !== 0) {
@@ -117,10 +129,10 @@ function computeRow(row, whichTime, direction) {
         row = rowOneLess;
         rowOneLess = row.slice(0, -1);
         
-        if(c2 > 0)
-            for(let k = 0; k < 3-whichComputeRow-c1-c2; k++) {
-                mov[k]++;
-            }
+        for(let h = 0; h < 3-2*whichComputeRow-c1-c2; h++) {
+            mov[h]++;
+            //mov[2-c1-c2]++;
+        }
     }
     let ans;
     whichComputeRow++;
@@ -135,20 +147,46 @@ function wipeMov() {
     whichComputeRow = 0;
 }
 
+function changeMov(forMov, mov) {
+    for(let i = 0; i < mov.length; i++) {
+        forMov[i] === 0 ? mov[i] = 0 : true;
+    }
+}
+
 function computeRowBasedOnKey(key, array) {
     let same = true;
     if(key === "ArrowRight") {
         for(let i = 0; i < 4; i++) {
+            let forMov = array[i].slice(0, -1);
             let temp = computeRow(array[i], i);
-            
-            for(let u = 0; u < 3; u++) {
-                let objMove;
-                if(objMove = cells.find(obj => obj.c[0] === i && obj.c[1] === u)) {
-                    let mov_i = mov[Math.min(2, i)];
-                    translateCell(objMove.it, key, mov_i);
-                    objMove.c[1] += mov_i;
+            //.find(obj => obj.c[0] === i && obj.c[1] === u)
+            changeMov(forMov, mov);
+            let objMove;
+            //let tempObj = cells.find(obj => obj.c[0] === i && obj.c[1] === 0);
+            //let mov_i = mov[Math.min(2, i)];
+            for(let x = 2; x >= 0; x--) {
+                if(mov[x] !== 0) {
+                    translateCell(cells2[i][x], key, mov[x]);
+                    if(cells2[i][x+mov[x]] !== null) {
+                        cells2[i][x].textContent *= 2;
+                        cells2[i][x+mov[x]].remove();
+                    }
+                    cells2[i][x+mov[x]] = cells2[i][x];
+                    cells2[i][x] = null;
                 }
+
+                // //tempObj.c[1] += mov_i;
+                // if(objMove = cells2[i][u]) {
+                //     mov_i = mov[Math.min(2, i)];
+                //     translateCell(objMove, key, mov_i);
+                //     tempObj.c[1]++;
+                // }
             }
+            // for(let o = 0; o < 4; o++) {
+            //     if(temp[o] === 0)
+            //         cells2[i][o] = null;
+
+            // }
 
             wipeMov();
             // check for each row being the same
@@ -244,14 +282,29 @@ const directions = {
 
 function translateCell(moveCell, direction, count) {
     let moveCellRect = moveCell.getBoundingClientRect();
-    positionX = moveCellRect.left;
-    positionY = moveCellRect.top;
+    positionX = moveCellRect.left - zeroX;
+    positionY = moveCellRect.top - zeroY;
 
-    console.log(directions[direction]);
+    console.log("posX and posY", positionX, positionY);
     if(directions[direction]) {
         positionX = count*directions[direction][0];
         positionY = count*directions[direction][1];
     }
+
+    const style = window.getComputedStyle(moveCell);
+    const matrix = new DOMMatrix(style.transform);
+
+    // Extract current translateX and add 150px
+    const currentX = matrix.m41; // m41 is translateX
+    const currentY = matrix.m42;
+
+    const newX = currentX + count*directions[direction][0];
+    const newY = currentY + count*directions[direction][1]
+
+    // Apply new transform
+    // element.style.transform = `translateX(${newX}px)`;
+
+
     // const placehold = document.createElement("div");
     // two.appendChild(placehold);
     // placehold.classList.add("square");
@@ -268,17 +321,19 @@ function translateCell(moveCell, direction, count) {
     //     left: ${reect.left}px; 
     //     width: ${reect.width}px;
     //     height: ${reect.height}px    
-    // `);
+    // // `);
+    // console.log("translatex: ", window.getComputedStyle(moveCell).transform.m41); // get translatex
+    // console.log("translatey: ", window.getComputedStyle(moveCell).transform.m42); // get translatex
     
     
     //console.log("somehting", placehold.getBoundingClientRect().left);
-    moveCell.style.transform = `translate(${positionX}px, ${positionY}px)`;
+    moveCell.style.transform = `translate(${newX}px, ${newY}px)`;
     //console.log("somehting", placehold.getBoundingClientRect().left);
     setTimeout(() => {
         console.log("after 1000");
 
       //  two.style.gridColumn = 0;
-    }, 1500);
+    }, 400);
 
     console.log("run!");
 }
@@ -337,9 +392,11 @@ function populateGrid() { // Make and populate grid; insert two
         square.style.height = `${squareSize}px`;
         square.style.boxSizing = "border-box";
 
-        const sqRect = square.getBoundingClientRect();
-        zeroX = sqRect.left;
-        zeroY = sqRect.top;
+        if(i === 0) {
+            const sqRect = square.getBoundingClientRect();
+            zeroX = sqRect.left;
+            zeroY = sqRect.top;
+        }
     
         // To populate based on arr:
         //square.textContent = ;
@@ -363,8 +420,10 @@ function populateGrid() { // Make and populate grid; insert two
             });
 
             twoCell.setAttribute("style", `
-                position: relative;
+                position: absolute;
                 `);
+
+            cells2[Math.floor(i/4)][i%4] = twoCell;
 
             twoCell.textContent = arr[Math.floor(i/4)][i%4]; //arr[Math.floor(i/4)][i%4];
             //arr[Math.floor(i/4)][i%4] = 2;
@@ -408,7 +467,7 @@ function handleKey(key) {
             same[i] = computeRowBasedOnKey(k, arr_copy);
             i++;
         });
-        if(same.every(bool => bool === true && !over)) { // GAME OVER
+        if(same.every(bool => bool === true) && !over) { // GAME OVER
             console.log("game over");
             // const button = document.createElement("button");
             // btn.appendChild(button);
