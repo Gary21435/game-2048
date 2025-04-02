@@ -90,11 +90,11 @@ h1 {
     font-weight: 900;
     color: var(--text-color);
 
-    width: calc(600px/4.4);
-    height: calc(600px/4.4);
+    /* width: calc(600px/4.4);
+    height: calc(600px/4.4); */
     box-sizing: border-box;
 
-    transition: transform 0.4s ease-in-out;
+    transition: transform 0.2s ease-in-out, width 0.1s, height 0.1s, background-color 1s;
 }
 
 .square {

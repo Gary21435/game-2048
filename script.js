@@ -23,10 +23,10 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [4, 0, 0, 0],
     [2, 0, 0, 0],
     [2, 0, 0, 0],
-    [2, 0, 0, 0]
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]
 ];
 
 
@@ -227,6 +227,7 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[i][x], key, mov[x]);
                     if(cells2[i][x+mov[x]] !== null) {
                         cells2[i][x].textContent *= 2;
+                        cells2[i][x].style.backgroundColor = backgroundColors[(Math.log(cells2[i][x].textContent) / Math.log(2))];
                         document.body.removeChild(cells2[i][x+mov[x]]);
                         cells2[i][x+mov[x]].remove();
                     }
@@ -256,6 +257,7 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[i][x], key, mov[x-1]);
                     if(cells2[i][x-mov[x-1]] !== null) {
                         cells2[i][x].textContent *= 2;
+                        cells2[i][x].style.backgroundColor = backgroundColors[(Math.log(cells2[i][x].textContent) / Math.log(2))];
                         document.body.removeChild(cells2[i][x-mov[x-1]]);
                         cells2[i][x-mov[x-1]].remove();
                     }
@@ -291,6 +293,7 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[x][i], key, mov[3-x]);
                     if(cells2[x-mov[3-x]][i] !== null) {
                         cells2[x][i].textContent *= 2;
+                        cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
                         document.body.removeChild(cells2[x-mov[3-x]][i]);
                         cells2[x-mov[3-x]][i].remove();
                     }
@@ -328,6 +331,7 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[x][i], key, mov[x]);
                     if(cells2[x+mov[x]][i] !== null) {
                         cells2[x][i].textContent *= 2;
+                        cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
                         document.body.removeChild(cells2[x+mov[x]][i]);
                         cells2[x+mov[x]][i].remove();
                     }
@@ -446,13 +450,16 @@ function translateCell(moveCell, direction, count) {
     // setTimeout(() => {
     //     console.log("after 1000");
     //     moveCell.style.transition = "transform 0s";
-    //     moveCell.style.left = `${zeroX+newX}px`;
     //     moveCell.style.transform = `translate(0px, 0px)`;
-    //     moveCell.style.transition = "transform 0.4s ease-in-out";
+    //     moveCell.style.left = `${zeroX+newX}px`;
+    //     moveCell.style.top = `${zeroY+newY}px`;
+    //     setTimeout(() => {
+    //         moveCell.style.transition = "transform 0.4s ease-in-out";
+    //     }, 1800);
     //     console.log("rect.left: ", moveCell.getBoundingClientRect().left);
     //     console.log("newX: ", zeroX+newX);
     //   //  two.style.gridColumn = 0;
-    // }, 1800);
+    // }, 500);
 
     console.log("run!");
 }
@@ -526,7 +533,7 @@ function populateGrid() { // Make and populate grid; insert two
 
         // Create absolute-positioned divs that go on top of the cells and house the numbers
     
-        if(arr[Math.floor(i/4)][i%4] === 2 || arr[Math.floor(i/4)][i%4] === 4 || arr[Math.floor(i/4)][i%4] === 8) { //(i === i1 || i === i2) {
+        if(arr[Math.floor(i/4)][i%4] !== 0) { //(i === i1 || i === i2) {
             const twoCell = document.createElement("div");
             document.body.appendChild(twoCell);
             twoCell.classList.add("cell");
@@ -553,6 +560,9 @@ function populateGrid() { // Make and populate grid; insert two
             twoCell.textContent = arr[Math.floor(i/4)][i%4]; //arr[Math.floor(i/4)][i%4];
             //arr[Math.floor(i/4)][i%4] = 2;
             twoCell.style.backgroundColor = backgroundColors[1];
+
+            twoCell.style.width = `${gridSize/4.4}px`;
+            twoCell.style.height = `${gridSize/4.4}px`;
         }
         // else {
         //     square.textContent = 0;
@@ -573,60 +583,73 @@ function handleKey(key) {
     // console.log(arr_copy);
 
     let same = [false, false, false, false];
-    // add a new 2 only if there is at least one empty cell
-    if((arr[0].includes(0) || arr[1].includes(0) || arr[2].includes(0) || arr[3].includes(0))) {
-        do {
-            index = getRandomCell();
-        }
-        while(arr[Math.floor(index/4)][index%4] !== 0);
 
-        arr[Math.floor(index/4)][index%4] = 2;
+    setTimeout(() => {
+        // add a new 2 only if there is at least one empty cell
+        if((arr[0].includes(0) || arr[1].includes(0) || arr[2].includes(0) || arr[3].includes(0))) {
+            do {
+                index = getRandomCell();
+            }
+            while(arr[Math.floor(index/4)][index%4] !== 0);
 
-        const newCell = document.createElement("div");
-        document.body.appendChild(newCell);
+            arr[Math.floor(index/4)][index%4] = 2;
 
-        const sqRec = squares[Math.floor(index/4)][index%4].getBoundingClientRect();
+            const newCell = document.createElement("div");
+            document.body.appendChild(newCell);
 
-        newCell.setAttribute("style", `
-            position: absolute;
-            left: ${sqRec.left}px;
-            top: ${sqRec.top}px;
-            `);
+            const sqRec = squares[Math.floor(index/4)][index%4].getBoundingClientRect();
 
-        newCell.classList.add("cell");
-        newCell.textContent = 2;
-        newCell.style.backgroundColor = backgroundColors[1];
+            newCell.setAttribute("style", `
+                position: absolute;
+                left: ${sqRec.left}px;
+                top: ${sqRec.top}px;
+                `);
 
-
-        
-
-        // set z-index higher than other children so it's visible
-        // const numChildren = lastsquares[Math.floor(index/4)][index%4].childElementCount;
-        // newCell.style.zIndex = `${numChildren}`;
-
-        cells2[Math.floor(index/4)][index%4] = newCell;
-    }
-    // Check for game over
-    else {
-        for(let i = 0; i < 4; i++) {
-            arr_copy[i] = arr[i];
-        }
-        let i = 0;
-        keys.forEach((k) => {
-            console.log("entered");
-            same[i] = computeRowBasedOnKey(k, arr_copy);
-            i++;
-        });
-        if(same.every(bool => bool === true) && !over) { // GAME OVER
-            console.log("game over");
-            // const button = document.createElement("button");
-            // btn.appendChild(button);
-            // button.textContent = "Start Over";
+            newCell.classList.add("cell");
+            newCell.textContent = 2;
             
-            displayMessage("Game Over!");
-            over = true;
+            newCell.style.backgroundColor = "red";
+            newCell.style.width = `${600/4.4-40}px`;
+            newCell.style.height = `${600/4.4-40}px`;
+            setTimeout(() => {
+                newCell.style.width = `${600/4.4}px`;
+                newCell.style.height = `${600/4.4}px`;
+            }, 100);
+            setTimeout(() => {
+                newCell.style.backgroundColor = backgroundColors[1];
+            }, 200);
+            
+
+            // set z-index higher than other children so it's visible
+            // const numChildren = lastsquares[Math.floor(index/4)][index%4].childElementCount;
+            // newCell.style.zIndex = `${numChildren}`;
+
+            cells2[Math.floor(index/4)][index%4] = newCell;
         }
-    }
+        // Check for game over
+        if(!(arr[0].includes(0) || arr[1].includes(0) || arr[2].includes(0) || arr[3].includes(0))) {
+            for(let i = 0; i < 4; i++) {
+                arr_copy[i] = arr[i];
+            }
+            let i = 0;
+            keys.forEach((k) => {
+                console.log("entered");
+                same[i] = computeRowBasedOnKey(k, arr_copy);
+                i++;
+            });
+            if(same.every(bool => bool === true) && !over) { // GAME OVER
+                console.log("game over");
+                // const button = document.createElement("button");
+                // btn.appendChild(button);
+                // button.textContent = "Start Over";
+                
+                displayMessage("Game Over!");
+                over = true;
+            }
+        }
+    }, 100);
+
+    
     //updateGrid();
 }
 
