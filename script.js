@@ -6,6 +6,7 @@ const btn = document.querySelector(".btn");
 const gameOver = document.querySelector(".game-over");
 let over = false;
 
+
 let zeroX, zeroY;
 let whichComputeRow = 0;
 
@@ -22,11 +23,12 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [2, 2, 2, 2],
-    [2, 2, 2, 2],
-    [2, 2, 2, 2],
-    [2, 2, 2, 2]
+    [4, 0, 0, 0],
+    [2, 0, 0, 0],
+    [2, 0, 0, 0],
+    [2, 0, 0, 0]
 ];
+
 
 // Rudimentary test for computeRow:
 // [2, 0, 0, 0] -> [0, 0, 0, 2] (try 2 at each spot)
@@ -40,6 +42,13 @@ const arr = [
 // [0, 2, 2, 4] -> [0, 0, 4, 4]
 // [4, 2, 0, 2] -> [0, 0, 4, 4]
 // [4, 4, 2, 8] -> [0, 8, 2, 8]
+
+const squares = [
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null]
+];
 
 const cells = [
     [null, null, null, null],
@@ -168,6 +177,18 @@ function computeRow(row, n, whichTime, direction) {
             }
             c3++;
         }
+        else if(rowOneLess.at(-2) === 0 && rowOneLess.at(-1) !== 0 && rowOneLess[0] && rowOneLess.length === 3) {
+            if(rowOneLess[0] !== 0) {
+                rowOneLess.splice(-2, 1);   
+                rowOneLess.unshift(0);
+                i--;
+        
+                for(let h = 0; h < 2; h++) {
+                    mov[h]++;
+                }
+                row = [...rowOneLess, row[n-1]];
+            }
+        }
         last = rowOneLess.at(-2-x);
     }    
     // let ans;
@@ -206,8 +227,13 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[i][x], key, mov[x]);
                     if(cells2[i][x+mov[x]] !== null) {
                         cells2[i][x].textContent *= 2;
+                        document.body.removeChild(cells2[i][x+mov[x]]);
                         cells2[i][x+mov[x]].remove();
                     }
+                    // change its parent
+                    // squares[i][x].removeChild(cells2[i][x]);
+                    // squares[i][x+mov[x]].appendChild(cells2[i][x]);
+
                     cells2[i][x+mov[x]] = cells2[i][x];
                     cells2[i][x] = null;
                 }
@@ -230,8 +256,13 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[i][x], key, mov[x-1]);
                     if(cells2[i][x-mov[x-1]] !== null) {
                         cells2[i][x].textContent *= 2;
+                        document.body.removeChild(cells2[i][x-mov[x-1]]);
                         cells2[i][x-mov[x-1]].remove();
                     }
+                    // change its parent
+                    // squares[i][x].removeChild(cells2[i][x]);
+                    // squares[i][x-mov[x-1]].appendChild(cells2[i][x]);
+
                     cells2[i][x-mov[x-1]] = cells2[i][x];
                     cells2[i][x] = null;
                 }
@@ -260,8 +291,13 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[x][i], key, mov[3-x]);
                     if(cells2[x-mov[3-x]][i] !== null) {
                         cells2[x][i].textContent *= 2;
+                        document.body.removeChild(cells2[x-mov[3-x]][i]);
                         cells2[x-mov[3-x]][i].remove();
                     }
+                    // change its parent
+                    // squares[x][i].removeChild(cells2[x][i]);
+                    // squares[x-mov[3-x]][i].appendChild(cells2[x][i]);
+
                     cells2[x-mov[3-x]][i] = cells2[x][i];
                     cells2[x][i] = null;
                 }
@@ -292,8 +328,13 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[x][i], key, mov[x]);
                     if(cells2[x+mov[x]][i] !== null) {
                         cells2[x][i].textContent *= 2;
+                        document.body.removeChild(cells2[x+mov[x]][i]);
                         cells2[x+mov[x]][i].remove();
                     }
+                    // change its parent
+                    // squares[x][i].removeChild(cells2[x][i]);
+                    // squares[x+mov[x]][i].appendChild(cells2[x][i]);
+
                     cells2[x+mov[x]][i] = cells2[x][i];
                     cells2[x][i] = null;
                 }
@@ -399,11 +440,19 @@ function translateCell(moveCell, direction, count) {
     //console.log("somehting", placehold.getBoundingClientRect().left);
     moveCell.style.transform = `translate(${newX}px, ${newY}px)`;
     //console.log("somehting", placehold.getBoundingClientRect().left);
-    setTimeout(() => {
-        console.log("after 1000");
 
-      //  two.style.gridColumn = 0;
-    }, 400);
+    
+
+    // setTimeout(() => {
+    //     console.log("after 1000");
+    //     moveCell.style.transition = "transform 0s";
+    //     moveCell.style.left = `${zeroX+newX}px`;
+    //     moveCell.style.transform = `translate(0px, 0px)`;
+    //     moveCell.style.transition = "transform 0.4s ease-in-out";
+    //     console.log("rect.left: ", moveCell.getBoundingClientRect().left);
+    //     console.log("newX: ", zeroX+newX);
+    //   //  two.style.gridColumn = 0;
+    // }, 1800);
 
     console.log("run!");
 }
@@ -455,6 +504,8 @@ function populateGrid() { // Make and populate grid; insert two
     for (let i = 0; i < 16; i++) {
         const square = document.createElement("div");
         grid.appendChild(square);
+
+        squares[Math.floor(i/4)][i%4] = square;
     
         square.classList.add("square");
         square.id = "sq" + String(i);
@@ -467,6 +518,8 @@ function populateGrid() { // Make and populate grid; insert two
             zeroX = sqRect.left;
             zeroY = sqRect.top;
         }
+
+        const sqRec = square.getBoundingClientRect();
     
         // To populate based on arr:
         //square.textContent = ;
@@ -475,7 +528,7 @@ function populateGrid() { // Make and populate grid; insert two
     
         if(arr[Math.floor(i/4)][i%4] === 2 || arr[Math.floor(i/4)][i%4] === 4 || arr[Math.floor(i/4)][i%4] === 8) { //(i === i1 || i === i2) {
             const twoCell = document.createElement("div");
-            square.appendChild(twoCell);
+            document.body.appendChild(twoCell);
             twoCell.classList.add("cell");
             // console.log("two left: ", twoCell.getBoundingClientRect().left);
             // console.log("two top: ", twoCell.getBoundingClientRect().top);
@@ -491,6 +544,8 @@ function populateGrid() { // Make and populate grid; insert two
 
             twoCell.setAttribute("style", `
                 position: absolute;
+                left: ${sqRec.left}px;
+                top: ${sqRec.top}px;
                 `);
 
             cells2[Math.floor(i/4)][i%4] = twoCell;
@@ -508,6 +563,7 @@ function populateGrid() { // Make and populate grid; insert two
 
 // Input
 function handleKey(key) {
+    console.log("zeroX", zeroX);
     computeRowBasedOnKey(key, arr);
     let index; 
     let arr_copy = new Array(4);
@@ -519,12 +575,36 @@ function handleKey(key) {
     let same = [false, false, false, false];
     // add a new 2 only if there is at least one empty cell
     if((arr[0].includes(0) || arr[1].includes(0) || arr[2].includes(0) || arr[3].includes(0))) {
-        // do {
-        //     index = getRandomCell();
-        // }
-        // while(arr[Math.floor(index/4)][index%4] !== 0);
+        do {
+            index = getRandomCell();
+        }
+        while(arr[Math.floor(index/4)][index%4] !== 0);
 
-        // arr[Math.floor(index/4)][index%4] = 2;
+        arr[Math.floor(index/4)][index%4] = 2;
+
+        const newCell = document.createElement("div");
+        document.body.appendChild(newCell);
+
+        const sqRec = squares[Math.floor(index/4)][index%4].getBoundingClientRect();
+
+        newCell.setAttribute("style", `
+            position: absolute;
+            left: ${sqRec.left}px;
+            top: ${sqRec.top}px;
+            `);
+
+        newCell.classList.add("cell");
+        newCell.textContent = 2;
+        newCell.style.backgroundColor = backgroundColors[1];
+
+
+        
+
+        // set z-index higher than other children so it's visible
+        // const numChildren = lastsquares[Math.floor(index/4)][index%4].childElementCount;
+        // newCell.style.zIndex = `${numChildren}`;
+
+        cells2[Math.floor(index/4)][index%4] = newCell;
     }
     // Check for game over
     else {
