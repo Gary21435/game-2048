@@ -22,7 +22,7 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [8, 2, 4, 4],
+    [2, 2, 2, 2],
     [2, 2, 2, 2],
     [2, 2, 2, 2],
     [2, 2, 2, 2]
@@ -249,9 +249,23 @@ function computeRowBasedOnKey(key, array) {
             for(let x = 0; x < 4; x++) {
                 upArr.unshift(array[x][i]);
             }
-            let temp = upArr;
+            let temp = upArr.slice();
+            forMov = temp.slice(0, -1);
             let comp = [];
             upArr = computeRow(upArr, 4);
+            c1 = c2 = c3 = 0;
+            changeMov(forMov, mov);
+            for(let x = 1; x < 4; x++) {
+                if(mov[3-x] !== 0) {
+                    translateCell(cells2[x][i], key, mov[3-x]);
+                    if(cells2[x-mov[3-x]][i] !== null) {
+                        cells2[x][i].textContent *= 2;
+                        cells2[x-mov[3-x]][i].remove();
+                    }
+                    cells2[x-mov[3-x]][i] = cells2[x][i];
+                    cells2[x][i] = null;
+                }
+            }
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[-1*(x-3)];
@@ -266,9 +280,25 @@ function computeRowBasedOnKey(key, array) {
             for(let x = 0; x < 4; x++) {
                 upArr.push(array[x][i]);
             }
-            let temp = upArr;
+            let temp = upArr.slice();
+            forMov = temp.slice(0, -1);
             let comp = [];
             upArr = computeRow(upArr, 4);
+
+            c1 = c2 = c3 = 0;
+            changeMov(forMov, mov);
+            for(let x = 2; x >= 0; x--) {
+                if(mov[x] !== 0) {
+                    translateCell(cells2[x][i], key, mov[x]);
+                    if(cells2[x+mov[x]][i] !== null) {
+                        cells2[x][i].textContent *= 2;
+                        cells2[x+mov[x]][i].remove();
+                    }
+                    cells2[x+mov[x]][i] = cells2[x][i];
+                    cells2[x][i] = null;
+                }
+            }
+
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[x];
