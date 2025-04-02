@@ -22,11 +22,24 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [2, 2, 2, 2],
+    [8, 2, 4, 4],
     [2, 2, 2, 2],
     [2, 2, 2, 2],
     [2, 2, 2, 2]
 ];
+
+// Rudimentary test for computeRow:
+// [2, 0, 0, 0] -> [0, 0, 0, 2] (try 2 at each spot)
+// [2, 2, 0, 0] -> [0, 0, 0, 4]
+// [2, 0, 2, 0] -> [0, 0, 0, 4]
+// [2, 0, 0, 2] -> [0, 0, 0, 2]
+// [0, 2, 2, 0] -> [0, 0, 0, 4]
+// [0, 2, 0, 2] -> [0, 0, 0, 4]
+// [0, 0, 2, 2] -> [0, 0, 0, 4]
+// [0, 4, 2, 2] -> [0, 0, 4, 4]
+// [0, 2, 2, 4] -> [0, 0, 4, 4]
+// [4, 2, 0, 2] -> [0, 0, 4, 4]
+// [4, 4, 2, 8] -> [0, 8, 2, 8]
 
 const cells = [
     [null, null, null, null],
@@ -43,8 +56,8 @@ const cells2 = [
 ];
 let mov = [0, 0, 0];
 
-let c1, c2;
-c1 = c2 = 0;
+let c1, c2, c3;
+c1 = c2 = c3 = 0;
 
 // for(let i = 0; i < 4; i++) {
 //     const tempArr = new Array(4);
@@ -76,9 +89,11 @@ let positionY = 0;
 // console.log(computeRow(arr1));
 
 /* -----------------------------------------FUNCTIONS------------------------------------------- */
+let rowOneLess;
+
 
 // Compute the array
-function computeRow(row, whichTime, direction) {
+function computeRow(row, n, whichTime, direction) {
     if(row.length === 2) return row; // stop condition
     //cell to move is [whichTime][]
     if(row.every(e => e === 0)) return row;
@@ -89,7 +104,7 @@ function computeRow(row, whichTime, direction) {
         row.unshift(0);
         i--;
 
-        for(let g = 0; g < 3-whichComputeRow-c1; g++)
+        for(let g = 0; g < n-1-c1; g++)
             mov[g]++;
 
         c1++;
@@ -104,45 +119,69 @@ function computeRow(row, whichTime, direction) {
     
     // computeRow will call translateCell(cells[i][j], direction, count)
 
-    let rowOneLess = row.slice(0, -1);
+    rowOneLess = row.slice(0, -1);
     i = rowOneLess.length-1;
     while(rowOneLess.at(-1) === 0 && i >= 0 && (rowOneLess[0] || rowOneLess[1])) {
         rowOneLess.pop();   
         rowOneLess.unshift(0);
         i--;
 
-        for(let h = 0; h < 3-whichComputeRow-c1-c2; h++) {
+        for(let h = 0; h < n-1-c1-c2; h++) {
             mov[h]++;
         }
         c2++;
     }
+    row = [...rowOneLess, row[3]];
 
     let last = row.at(-1);
-    if(last === rowOneLess.at(-1) && last !== 0) {
-        last *= 2;
-        if(last === 2048) {
-            displayMessage("You Won!");
-            over = true;
-        }
-        rowOneLess.unshift(0);
-        rowOneLess[rowOneLess.length-1] = last;
-        row = rowOneLess;
-        rowOneLess = row.slice(0, -1);
+    for(let x = 0; x < n-1; x++) {
+        if(x === 2 && c3 === 0) rowOneLess.pop();
+        if(last === rowOneLess.at(-1) && last !== 0) {
+            last *= 2;
+            if(last === 2048) {
+                displayMessage("You Won!");
+                over = true;
+            }
+            row.splice(-1-x, 1);
+            row.unshift(0);
+            row[n-1-x] = last;
+            // row = rowOneLess;
+            rowOneLess = row.slice(0, -1);
+
+            if(rowOneLess.at(-2) !== 0 && rowOneLess.at(-1) === 0) {
+                rowOneLess.pop();   
+                rowOneLess.unshift(0);
+                i--;
         
-        for(let h = 0; h < 3-2*whichComputeRow-c1-c2; h++) {
-            mov[h]++;
-            //mov[2-c1-c2]++;
+                for(let h = 0; h < 2; h++) {
+                    mov[h]++;
+                }
+                
+            }
+            row = [...rowOneLess, row[n-1]];
+
+
+            //Math.max(0, whichComputeRow-c1-c2)
+            for(let h = 0; h < 3-c1-c2-c3-x; h++) {
+                mov[h]++;
+                //mov[2-c1-c2]++;
+            }
+            c3++;
         }
-    }
-    let ans;
-    whichComputeRow++;
-    ans = computeRow(rowOneLess, last);
-    ans.push(last);
-    return ans;
+        last = rowOneLess.at(-2-x);
+    }    
+    // let ans;
+    // whichComputeRow++;
+    // ans = computeRow(rowOneLess, last);
+    // ans.push(last);
+    // if(c1+c2+c3 === 0) { 
+    //     computeRow(rowOneLess, 3);
+    // }
+    return row;
 }
 
 function wipeMov() {
-    for(let i=0; i<4; i++)
+    for(let i=0; i<3; i++)
         mov[i] = 0;
     whichComputeRow = 0;
 }
@@ -158,12 +197,10 @@ function computeRowBasedOnKey(key, array) {
     if(key === "ArrowRight") {
         for(let i = 0; i < 4; i++) {
             let forMov = array[i].slice(0, -1);
-            let temp = computeRow(array[i], i);
-            //.find(obj => obj.c[0] === i && obj.c[1] === u)
+            let temp = computeRow(array[i], 4);
+            //if (c3 && c2+c1 === 0) mov[2] =0;
+            c1 = c2 = c3 = 0;
             changeMov(forMov, mov);
-            let objMove;
-            //let tempObj = cells.find(obj => obj.c[0] === i && obj.c[1] === 0);
-            //let mov_i = mov[Math.min(2, i)];
             for(let x = 2; x >= 0; x--) {
                 if(mov[x] !== 0) {
                     translateCell(cells2[i][x], key, mov[x]);
@@ -174,29 +211,33 @@ function computeRowBasedOnKey(key, array) {
                     cells2[i][x+mov[x]] = cells2[i][x];
                     cells2[i][x] = null;
                 }
-
-                // //tempObj.c[1] += mov_i;
-                // if(objMove = cells2[i][u]) {
-                //     mov_i = mov[Math.min(2, i)];
-                //     translateCell(objMove, key, mov_i);
-                //     tempObj.c[1]++;
-                // }
             }
-            // for(let o = 0; o < 4; o++) {
-            //     if(temp[o] === 0)
-            //         cells2[i][o] = null;
-
-            // }
-
             wipeMov();
-            // check for each row being the same
+            // check for each row being the same; for game-over condition
             if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
             array[i] = temp;
         }
     }
     else if(key === "ArrowLeft") {
         for(let i = 0; i < 4; i++) {
-            let temp = mirrorRow(computeRow(mirrorRow(array[i]), i));
+            let forMov = mirrorRow(array[i]).slice(0, -1);
+            let temp = mirrorRow(computeRow(mirrorRow(array[i]), 4));
+            c1 = c2 = c3 = 0;
+            changeMov(forMov, mov);
+            mov = mirrorRow(mov);
+            for(let x = 1; x < 4; x++) {
+                if(mov[x-1] !== 0) {
+                    translateCell(cells2[i][x], key, mov[x-1]);
+                    if(cells2[i][x-mov[x-1]] !== null) {
+                        cells2[i][x].textContent *= 2;
+                        cells2[i][x-mov[x-1]].remove();
+                    }
+                    cells2[i][x-mov[x-1]] = cells2[i][x];
+                    cells2[i][x] = null;
+                }
+            }
+            
+            
             wipeMov();
             if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
             array[i] = temp;
@@ -210,7 +251,7 @@ function computeRowBasedOnKey(key, array) {
             }
             let temp = upArr;
             let comp = [];
-            upArr = computeRow(upArr, i);
+            upArr = computeRow(upArr, 4);
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[-1*(x-3)];
@@ -227,7 +268,7 @@ function computeRowBasedOnKey(key, array) {
             }
             let temp = upArr;
             let comp = [];
-            upArr = computeRow(upArr, i);
+            upArr = computeRow(upArr, 4);
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[x];
@@ -241,11 +282,10 @@ function computeRowBasedOnKey(key, array) {
 
 // Helper functions
 function mirrorRow(arr) {
-    let ans = new Array(4);
-    ans[0] = arr[3];
-    ans[1] = arr[2];
-    ans[2] = arr[1];
-    ans[3] = arr[0];
+    let len = arr.length;
+    let ans = new Array(len);
+    for(let i = 0; i < len; i++) 
+        ans[i] = arr[len-1-i];
     return ans;
 }
 
@@ -403,7 +443,7 @@ function populateGrid() { // Make and populate grid; insert two
 
         // Create absolute-positioned divs that go on top of the cells and house the numbers
     
-        if(arr[Math.floor(i/4)][i%4] === 2 || arr[Math.floor(i/4)][i%4] === 4) { //(i === i1 || i === i2) {
+        if(arr[Math.floor(i/4)][i%4] === 2 || arr[Math.floor(i/4)][i%4] === 4 || arr[Math.floor(i/4)][i%4] === 8) { //(i === i1 || i === i2) {
             const twoCell = document.createElement("div");
             square.appendChild(twoCell);
             twoCell.classList.add("cell");
