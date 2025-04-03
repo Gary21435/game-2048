@@ -28,10 +28,10 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [2, 4, 2, 4],
-    [4, 64, 8, 2],
-    [8, 2, 64, 16],
-    [2, 4, 64, 0]
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]
 ];
 
 
@@ -571,7 +571,7 @@ function populateGrid() { // Make and populate grid; insert two
 
         // Create absolute-positioned divs that go on top of the cells and house the numbers
     
-        if(arr[Math.floor(i/4)][i%4] !== 0) { //(i === i1 || i === i2) {
+        if(i === i1 || i === i2) { // arr[Math.floor(i/4)][i%4] !== 0) { 
             const twoCell = document.createElement("div");
             document.body.appendChild(twoCell);
             twoCell.classList.add("cell");
@@ -595,8 +595,8 @@ function populateGrid() { // Make and populate grid; insert two
 
             cells2[Math.floor(i/4)][i%4] = twoCell;
 
-            twoCell.textContent = arr[Math.floor(i/4)][i%4]; //arr[Math.floor(i/4)][i%4];
-            //arr[Math.floor(i/4)][i%4] = 2;
+            twoCell.textContent = 2; //arr[Math.floor(i/4)][i%4];
+            arr[Math.floor(i/4)][i%4] = 2;
             twoCell.style.backgroundColor = backgroundColors[1];
 
             twoCell.style.width = `${gridSize/4.4}px`;
