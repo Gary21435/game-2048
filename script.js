@@ -5,7 +5,12 @@ const grid = document.querySelector(".container");
 const btn = document.querySelector(".btn");
 const gameOver = document.querySelector(".game-over");
 let over = false;
-
+let thing = [
+    [],
+    [],
+    [],
+    []
+];
 
 let zeroX, zeroY;
 let whichComputeRow = 0;
@@ -222,7 +227,7 @@ function computeRowBasedOnKey(key, array, justCompute) {
             //if (c3 && c2+c1 === 0) mov[2] =0;
             c1 = c2 = c3 = 0;
             changeMov(forMov, mov);
-            if(!justCompute) {
+            if(!justCompute) {    
                 for(let x = 2; x >= 0; x--) {
                     if(mov[x] !== 0) {
                         translateCell(cells2[i][x], key, mov[x]);
@@ -235,13 +240,12 @@ function computeRowBasedOnKey(key, array, justCompute) {
                         // change its parent
                         // squares[i][x].removeChild(cells2[i][x]);
                         // squares[i][x+mov[x]].appendChild(cells2[i][x]);
-    
+
                         cells2[i][x+mov[x]] = cells2[i][x];
                         cells2[i][x] = null;
                     }
                 }
             }
-            
             wipeMov();
             // check for each row being the same; for game-over condition
             if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
@@ -255,19 +259,18 @@ function computeRowBasedOnKey(key, array, justCompute) {
             c1 = c2 = c3 = 0;
             changeMov(forMov, mov);
             mov = mirrorRow(mov);
-            if(!justCompute) { // for game-over check
-                for(let x = 1; x < 4; x++) {
-                    if(mov[x-1] !== 0) {
-                        translateCell(cells2[i][x], key, mov[x-1]);
-                        if(cells2[i][x-mov[x-1]] !== null) {
-                            cells2[i][x].textContent *= 2;
-                            cells2[i][x].style.backgroundColor = backgroundColors[(Math.log(cells2[i][x].textContent) / Math.log(2))];
-                            document.body.removeChild(cells2[i][x-mov[x-1]]);
-                            cells2[i][x-mov[x-1]].remove();
-                        }
-                        // change its parent
-                        // squares[i][x].removeChild(cells2[i][x]);
-                        // squares[i][x-mov[x-1]].appendChild(cells2[i][x]);
+            for(let x = 1; x < 4; x++) {
+                if(mov[x-1] !== 0) {
+                    translateCell(cells2[i][x], key, mov[x-1]);
+                    if(cells2[i][x-mov[x-1]] !== null) {
+                        cells2[i][x].textContent *= 2;
+                        cells2[i][x].style.backgroundColor = backgroundColors[(Math.log(cells2[i][x].textContent) / Math.log(2))];
+                        document.body.removeChild(cells2[i][x-mov[x-1]]);
+                        cells2[i][x-mov[x-1]].remove();
+                    }
+                    // change its parent
+                    // squares[i][x].removeChild(cells2[i][x]);
+                    // squares[i][x-mov[x-1]].appendChild(cells2[i][x]);
 
                         cells2[i][x-mov[x-1]] = cells2[i][x];
                         cells2[i][x] = null;
@@ -293,26 +296,23 @@ function computeRowBasedOnKey(key, array, justCompute) {
             upArr = computeRow(upArr, 4);
             c1 = c2 = c3 = 0;
             changeMov(forMov, mov);
-            if(!justCompute) {
-                for(let x = 1; x < 4; x++) {
-                    if(mov[3-x] !== 0) {
-                        translateCell(cells2[x][i], key, mov[3-x]);
-                        if(cells2[x-mov[3-x]][i] !== null) {
-                            cells2[x][i].textContent *= 2;
-                            cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
-                            document.body.removeChild(cells2[x-mov[3-x]][i]);
-                            cells2[x-mov[3-x]][i].remove();
-                        }
-                        // change its parent
-                        // squares[x][i].removeChild(cells2[x][i]);
-                        // squares[x-mov[3-x]][i].appendChild(cells2[x][i]);
-    
-                        cells2[x-mov[3-x]][i] = cells2[x][i];
-                        cells2[x][i] = null;
+            for(let x = 1; x < 4; x++) {
+                if(mov[3-x] !== 0) {
+                    translateCell(cells2[x][i], key, mov[3-x]);
+                    if(cells2[x-mov[3-x]][i] !== null) {
+                        cells2[x][i].textContent *= 2;
+                        cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
+                        document.body.removeChild(cells2[x-mov[3-x]][i]);
+                        cells2[x-mov[3-x]][i].remove();
                     }
+                    // change its parent
+                    // squares[x][i].removeChild(cells2[x][i]);
+                    // squares[x-mov[3-x]][i].appendChild(cells2[x][i]);
+
+                    cells2[x-mov[3-x]][i] = cells2[x][i];
+                    cells2[x][i] = null;
                 }
             }
-            
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[-1*(x-3)];
@@ -332,25 +332,23 @@ function computeRowBasedOnKey(key, array, justCompute) {
             let comp = [];
             upArr = computeRow(upArr, 4);
 
-            if(!justCompute) {
-                c1 = c2 = c3 = 0;
-                changeMov(forMov, mov);
-                for(let x = 2; x >= 0; x--) {
-                    if(mov[x] !== 0) {
-                        translateCell(cells2[x][i], key, mov[x]);
-                        if(cells2[x+mov[x]][i] !== null) {
-                            cells2[x][i].textContent *= 2;
-                            cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
-                            document.body.removeChild(cells2[x+mov[x]][i]);
-                            cells2[x+mov[x]][i].remove();
-                        }
-                        // change its parent
-                        // squares[x][i].removeChild(cells2[x][i]);
-                        // squares[x+mov[x]][i].appendChild(cells2[x][i]);
-    
-                        cells2[x+mov[x]][i] = cells2[x][i];
-                        cells2[x][i] = null;
+            c1 = c2 = c3 = 0;
+            changeMov(forMov, mov);
+            for(let x = 2; x >= 0; x--) {
+                if(mov[x] !== 0) {
+                    translateCell(cells2[x][i], key, mov[x]);
+                    if(cells2[x+mov[x]][i] !== null) {
+                        cells2[x][i].textContent *= 2;
+                        cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
+                        document.body.removeChild(cells2[x+mov[x]][i]);
+                        cells2[x+mov[x]][i].remove();
                     }
+                    // change its parent
+                    // squares[x][i].removeChild(cells2[x][i]);
+                    // squares[x+mov[x]][i].appendChild(cells2[x][i]);
+
+                    cells2[x+mov[x]][i] = cells2[x][i];
+                    cells2[x][i] = null;
                 }
             }
             
