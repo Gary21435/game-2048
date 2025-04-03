@@ -30,8 +30,8 @@ grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}p
 const arr = [
     [2, 4, 2, 4],
     [4, 64, 8, 2],
-    [8, 2, 512, 16],
-    [2, 4, 512, 0]
+    [8, 2, 64, 16],
+    [2, 4, 64, 0]
 ];
 
 
@@ -545,25 +545,6 @@ function startOver() {
     })
 }
 
-function updateGrid() {
-    let i = 0;
-    while(i < 16) {
-        let square = document.querySelector(`#sq${String(i)}`)
-        let numSq = arr[Math.floor(i/4)][i%4];
-        square.textContent = numSq;
-        if(numSq === 0) {
-            square.style.backgroundColor = backgroundColors[0];
-            square.style.color = "#4e453e";
-        }
-        else {
-            if(numSq > 4) square.style.color = "white";
-            else square.style.color = "#4e453e"
-            square.style.backgroundColor = backgroundColors[(Math.log(numSq) / Math.log(2))];
-        }
-        i++;
-    }
-}
-
 function populateGrid() { // Make and populate grid; insert two
     for (let i = 0; i < 16; i++) {
         const square = document.createElement("div");
@@ -705,9 +686,6 @@ function handleKey(key) {
             }
         }
     }, 100);
-
-    
-    //updateGrid();
 }
 
 // EVENT LISTENERS
