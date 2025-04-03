@@ -5,7 +5,12 @@ const grid = document.querySelector(".container");
 const btn = document.querySelector(".btn");
 const gameOver = document.querySelector(".game-over");
 let over = false;
-
+let thing = [
+    [],
+    [],
+    [],
+    []
+];
 
 let zeroX, zeroY;
 let whichComputeRow = 0;
@@ -227,7 +232,14 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[i][x], key, mov[x]);
                     if(cells2[i][x+mov[x]] !== null) {
                         cells2[i][x].textContent *= 2;
-                        cells2[i][x].style.backgroundColor = backgroundColors[(Math.log(cells2[i][x].textContent) / Math.log(2))];
+                        cells2[i][x].style.backgroundColor = "blue";
+                        if(cells2[i][x].textContent > 4)
+                            cells2[i][x].style.color = sixteenColor;
+                        thing[0].push(cells2[i][x]);
+                        setTimeout(() => {
+                            thing[0][0].style.backgroundColor = backgroundColors[(Math.log(thing[0][0].textContent) / Math.log(2))];
+                            thing[0].shift();
+                        }, 200);
                         document.body.removeChild(cells2[i][x+mov[x]]);
                         cells2[i][x+mov[x]].remove();
                     }
@@ -257,7 +269,14 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[i][x], key, mov[x-1]);
                     if(cells2[i][x-mov[x-1]] !== null) {
                         cells2[i][x].textContent *= 2;
-                        cells2[i][x].style.backgroundColor = backgroundColors[(Math.log(cells2[i][x].textContent) / Math.log(2))];
+                        cells2[i][x].style.backgroundColor = "blue";
+                        if(cells2[i][x].textContent > 4)
+                            cells2[i][x].style.color = sixteenColor;
+                        thing[1].push(cells2[i][x]);
+                        setTimeout(() => {
+                            thing[1][0].style.backgroundColor = backgroundColors[(Math.log(thing[1][0].textContent) / Math.log(2))];
+                            thing[1].shift();
+                        }, 200);
                         document.body.removeChild(cells2[i][x-mov[x-1]]);
                         cells2[i][x-mov[x-1]].remove();
                     }
@@ -293,7 +312,14 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[x][i], key, mov[3-x]);
                     if(cells2[x-mov[3-x]][i] !== null) {
                         cells2[x][i].textContent *= 2;
-                        cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
+                        cells2[x][i].style.backgroundColor = "blue";
+                        if(cells2[x][i].textContent > 4)
+                            cells2[x][i].style.color = sixteenColor;
+                        thing[2].push(cells2[x][i]);
+                        setTimeout(() => {
+                            thing[2][0].style.backgroundColor = backgroundColors[(Math.log(thing[2][0].textContent) / Math.log(2))];
+                            thing[2].shift();
+                        }, 200);
                         document.body.removeChild(cells2[x-mov[3-x]][i]);
                         cells2[x-mov[3-x]][i].remove();
                     }
@@ -331,7 +357,14 @@ function computeRowBasedOnKey(key, array) {
                     translateCell(cells2[x][i], key, mov[x]);
                     if(cells2[x+mov[x]][i] !== null) {
                         cells2[x][i].textContent *= 2;
-                        cells2[x][i].style.backgroundColor = backgroundColors[(Math.log(cells2[x][i].textContent) / Math.log(2))];
+                        cells2[x][i].style.backgroundColor = "blue";
+                        if(cells2[x][i].textContent > 4)
+                            cells2[x][i].style.color = sixteenColor;
+                        thing[3].push(cells2[x][i]);
+                        setTimeout(() => {
+                            thing[3][0].style.backgroundColor = backgroundColors[(Math.log(thing[3][0].textContent) / Math.log(2))];
+                            thing[3].shift();
+                        }, 200);
                         document.body.removeChild(cells2[x+mov[x]][i]);
                         cells2[x+mov[x]][i].remove();
                     }
