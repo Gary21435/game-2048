@@ -28,10 +28,10 @@ grid.style.display = "grid";
 grid.style.gridTemplate = `repeat(4, ${gridSize/4}px) / repeat(4, ${gridSize/4}px)`;
 
 const arr = [
-    [2, 0, 0, 0],
-    [2, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
+    [2, 4, 2, 4],
+    [4, 64, 8, 2],
+    [8, 2, 512, 16],
+    [2, 4, 512, 0]
 ];
 
 
@@ -218,7 +218,7 @@ function changeMov(forMov, mov) {
     }
 }
 
-function computeRowBasedOnKey(key, array) {
+function computeRowBasedOnKey(key, array, justCompute) {
     let same = true;
     if(key === "ArrowRight") {
         for(let i = 0; i < 4; i++) {
@@ -227,30 +227,37 @@ function computeRowBasedOnKey(key, array) {
             //if (c3 && c2+c1 === 0) mov[2] =0;
             c1 = c2 = c3 = 0;
             changeMov(forMov, mov);
-            for(let x = 2; x >= 0; x--) {
-                if(mov[x] !== 0) {
-                    translateCell(cells2[i][x], key, mov[x]);
-                    if(cells2[i][x+mov[x]] !== null) {
-                        cells2[i][x].textContent *= 2;
-                        cells2[i][x].style.backgroundColor = "blue";
-                        if(cells2[i][x].textContent > 4)
-                            cells2[i][x].style.color = sixteenColor;
-                        thing[0].push(cells2[i][x]);
-                        setTimeout(() => {
-                            thing[0][0].style.backgroundColor = backgroundColors[(Math.log(thing[0][0].textContent) / Math.log(2))];
-                            thing[0].shift();
-                        }, 200);
-                        document.body.removeChild(cells2[i][x+mov[x]]);
-                        cells2[i][x+mov[x]].remove();
+            if(!justCompute) { // if not checking for game-over
+                for(let x = 2; x >= 0; x--) {
+                    if(mov[x] !== 0) {
+                        translateCell(cells2[i][x], key, mov[x]);
+                        if(cells2[i][x+mov[x]] !== null) {
+                            cells2[i][x].textContent *= 2;
+                            cells2[i][x].style.backgroundColor = "blue";
+                            if(cells2[i][x].textContent > 100)
+                                cells2[i][x].style.fontSize = "60px";
+                            else if(cells2[i][x].textContent > 1000)
+                                cells2[i][x].style.fontSize = "32px";
+                            if(cells2[i][x].textContent > 4)
+                                cells2[i][x].style.color = sixteenColor;
+                            thing[0].push(cells2[i][x]);
+                            setTimeout(() => {
+                                thing[0][0].style.backgroundColor = backgroundColors[(Math.log(thing[0][0].textContent) / Math.log(2))];
+                                thing[0].shift();
+                            }, 200);
+                            document.body.removeChild(cells2[i][x+mov[x]]);
+                            cells2[i][x+mov[x]].remove();
+                        }
+                        // change its parent
+                        // squares[i][x].removeChild(cells2[i][x]);
+                        // squares[i][x+mov[x]].appendChild(cells2[i][x]);
+    
+                        cells2[i][x+mov[x]] = cells2[i][x];
+                        cells2[i][x] = null;
                     }
-                    // change its parent
-                    // squares[i][x].removeChild(cells2[i][x]);
-                    // squares[i][x+mov[x]].appendChild(cells2[i][x]);
-
-                    cells2[i][x+mov[x]] = cells2[i][x];
-                    cells2[i][x] = null;
                 }
             }
+            
             wipeMov();
             // check for each row being the same; for game-over condition
             if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
@@ -264,31 +271,36 @@ function computeRowBasedOnKey(key, array) {
             c1 = c2 = c3 = 0;
             changeMov(forMov, mov);
             mov = mirrorRow(mov);
-            for(let x = 1; x < 4; x++) {
-                if(mov[x-1] !== 0) {
-                    translateCell(cells2[i][x], key, mov[x-1]);
-                    if(cells2[i][x-mov[x-1]] !== null) {
-                        cells2[i][x].textContent *= 2;
-                        cells2[i][x].style.backgroundColor = "blue";
-                        if(cells2[i][x].textContent > 4)
-                            cells2[i][x].style.color = sixteenColor;
-                        thing[1].push(cells2[i][x]);
-                        setTimeout(() => {
-                            thing[1][0].style.backgroundColor = backgroundColors[(Math.log(thing[1][0].textContent) / Math.log(2))];
-                            thing[1].shift();
-                        }, 200);
-                        document.body.removeChild(cells2[i][x-mov[x-1]]);
-                        cells2[i][x-mov[x-1]].remove();
+            if(!justCompute) {
+                for(let x = 1; x < 4; x++) {
+                    if(mov[x-1] !== 0) {
+                        translateCell(cells2[i][x], key, mov[x-1]);
+                        if(cells2[i][x-mov[x-1]] !== null) {
+                            cells2[i][x].textContent *= 2;
+                            cells2[i][x].style.backgroundColor = "blue";
+                            if(cells2[i][x].textContent > 100)
+                                cells2[i][x].style.fontSize = "60px";
+                            else if(cells2[i][x].textContent > 1000)
+                                cells2[i][x].style.fontSize = "32px";
+                            if(cells2[i][x].textContent > 4)
+                                cells2[i][x].style.color = sixteenColor;
+                            thing[1].push(cells2[i][x]);
+                            setTimeout(() => {
+                                thing[1][0].style.backgroundColor = backgroundColors[(Math.log(thing[1][0].textContent) / Math.log(2))];
+                                thing[1].shift();
+                            }, 200);
+                            document.body.removeChild(cells2[i][x-mov[x-1]]);
+                            cells2[i][x-mov[x-1]].remove();
+                        }
+                        // change its parent
+                        // squares[i][x].removeChild(cells2[i][x]);
+                        // squares[i][x-mov[x-1]].appendChild(cells2[i][x]);
+    
+                        cells2[i][x-mov[x-1]] = cells2[i][x];
+                        cells2[i][x] = null;
                     }
-                    // change its parent
-                    // squares[i][x].removeChild(cells2[i][x]);
-                    // squares[i][x-mov[x-1]].appendChild(cells2[i][x]);
-
-                    cells2[i][x-mov[x-1]] = cells2[i][x];
-                    cells2[i][x] = null;
                 }
             }
-            
             
             wipeMov();
             if(JSON.stringify(array[i]) !== JSON.stringify(temp)) same = false;
@@ -306,31 +318,38 @@ function computeRowBasedOnKey(key, array) {
             let comp = [];
             upArr = computeRow(upArr, 4);
             c1 = c2 = c3 = 0;
-            changeMov(forMov, mov);
-            for(let x = 1; x < 4; x++) {
-                if(mov[3-x] !== 0) {
-                    translateCell(cells2[x][i], key, mov[3-x]);
-                    if(cells2[x-mov[3-x]][i] !== null) {
-                        cells2[x][i].textContent *= 2;
-                        cells2[x][i].style.backgroundColor = "blue";
-                        if(cells2[x][i].textContent > 4)
-                            cells2[x][i].style.color = sixteenColor;
-                        thing[2].push(cells2[x][i]);
-                        setTimeout(() => {
-                            thing[2][0].style.backgroundColor = backgroundColors[(Math.log(thing[2][0].textContent) / Math.log(2))];
-                            thing[2].shift();
-                        }, 200);
-                        document.body.removeChild(cells2[x-mov[3-x]][i]);
-                        cells2[x-mov[3-x]][i].remove();
+            if(!justCompute) {
+                changeMov(forMov, mov);
+                for(let x = 1; x < 4; x++) {
+                    if(mov[3-x] !== 0) {
+                        translateCell(cells2[x][i], key, mov[3-x]);
+                        if(cells2[x-mov[3-x]][i] !== null) {
+                            cells2[x][i].textContent *= 2;
+                            cells2[x][i].style.backgroundColor = "blue";
+                            if(cells2[x][i].textContent > 100)
+                                cells2[x][i].style.fontSize = "60px";
+                            else if(cells2[x][i].textContent > 1000)
+                                cells2[x][i].style.fontSize = "12px";
+                            if(cells2[x][i].textContent > 4)
+                                cells2[x][i].style.color = sixteenColor;
+                            thing[2].push(cells2[x][i]);
+                            setTimeout(() => {
+                                thing[2][0].style.backgroundColor = backgroundColors[(Math.log(thing[2][0].textContent) / Math.log(2))];
+                                thing[2].shift();
+                            }, 200);
+                            document.body.removeChild(cells2[x-mov[3-x]][i]);
+                            cells2[x-mov[3-x]][i].remove();
+                        }
+                        // change its parent
+                        // squares[x][i].removeChild(cells2[x][i]);
+                        // squares[x-mov[3-x]][i].appendChild(cells2[x][i]);
+    
+                        cells2[x-mov[3-x]][i] = cells2[x][i];
+                        cells2[x][i] = null;
                     }
-                    // change its parent
-                    // squares[x][i].removeChild(cells2[x][i]);
-                    // squares[x-mov[3-x]][i].appendChild(cells2[x][i]);
-
-                    cells2[x-mov[3-x]][i] = cells2[x][i];
-                    cells2[x][i] = null;
                 }
             }
+            
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[-1*(x-3)];
@@ -349,34 +368,39 @@ function computeRowBasedOnKey(key, array) {
             forMov = temp.slice(0, -1);
             let comp = [];
             upArr = computeRow(upArr, 4);
-
             c1 = c2 = c3 = 0;
-            changeMov(forMov, mov);
-            for(let x = 2; x >= 0; x--) {
-                if(mov[x] !== 0) {
-                    translateCell(cells2[x][i], key, mov[x]);
-                    if(cells2[x+mov[x]][i] !== null) {
-                        cells2[x][i].textContent *= 2;
-                        cells2[x][i].style.backgroundColor = "blue";
-                        if(cells2[x][i].textContent > 4)
-                            cells2[x][i].style.color = sixteenColor;
-                        thing[3].push(cells2[x][i]);
-                        setTimeout(() => {
-                            thing[3][0].style.backgroundColor = backgroundColors[(Math.log(thing[3][0].textContent) / Math.log(2))];
-                            thing[3].shift();
-                        }, 200);
-                        document.body.removeChild(cells2[x+mov[x]][i]);
-                        cells2[x+mov[x]][i].remove();
+            if(!justCompute) {
+                changeMov(forMov, mov);
+                for(let x = 2; x >= 0; x--) {
+                    if(mov[x] !== 0) {
+                        translateCell(cells2[x][i], key, mov[x]);
+                        if(cells2[x+mov[x]][i] !== null) {
+                            cells2[x][i].textContent *= 2;
+                            cells2[x][i].style.backgroundColor = "blue";
+                            if(cells2[x][i].textContent > 100)
+                                cells2[x][i].style.fontSize = "60px";
+                            else if(cells2[x][i].textContent > 1000)
+                                cells2[x][i].style.fontSize = "32px";
+                            if(cells2[x][i].textContent > 4)
+                                cells2[x][i].style.color = sixteenColor;
+                            thing[3].push(cells2[x][i]);
+                            setTimeout(() => {
+                                thing[3][0].style.backgroundColor = backgroundColors[(Math.log(thing[3][0].textContent) / Math.log(2))];
+                                thing[3].shift();
+                            }, 200);
+                            document.body.removeChild(cells2[x+mov[x]][i]);
+                            cells2[x+mov[x]][i].remove();
+                        }
+                        // change its parent
+                        // squares[x][i].removeChild(cells2[x][i]);
+                        // squares[x+mov[x]][i].appendChild(cells2[x][i]);
+    
+                        cells2[x+mov[x]][i] = cells2[x][i];
+                        cells2[x][i] = null;
                     }
-                    // change its parent
-                    // squares[x][i].removeChild(cells2[x][i]);
-                    // squares[x+mov[x]][i].appendChild(cells2[x][i]);
-
-                    cells2[x+mov[x]][i] = cells2[x][i];
-                    cells2[x][i] = null;
                 }
             }
-
+            
             wipeMov();
             for(let x = 0; x < 4; x++) {
                 array[x][i] = upArr[x];
@@ -667,7 +691,7 @@ function handleKey(key) {
             let i = 0;
             keys.forEach((k) => {
                 console.log("entered");
-                same[i] = computeRowBasedOnKey(k, arr_copy);
+                same[i] = computeRowBasedOnKey(k, arr_copy, true);
                 i++;
             });
             if(same.every(bool => bool === true) && !over) { // GAME OVER
