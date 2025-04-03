@@ -236,8 +236,8 @@ function computeRowBasedOnKey(key, array, justCompute) {
                             cells2[i][x].style.backgroundColor = "blue";
                             if(cells2[i][x].textContent > 100)
                                 cells2[i][x].style.fontSize = "60px";
-                            else if(cells2[i][x].textContent > 1000)
-                                cells2[i][x].style.fontSize = "32px";
+                            if(cells2[i][x].textContent > 1000)
+                                cells2[i][x].style.fontSize = "44px";
                             if(cells2[i][x].textContent > 4)
                                 cells2[i][x].style.color = sixteenColor;
                             thing[0].push(cells2[i][x]);
@@ -280,8 +280,8 @@ function computeRowBasedOnKey(key, array, justCompute) {
                             cells2[i][x].style.backgroundColor = "blue";
                             if(cells2[i][x].textContent > 100)
                                 cells2[i][x].style.fontSize = "60px";
-                            else if(cells2[i][x].textContent > 1000)
-                                cells2[i][x].style.fontSize = "32px";
+                            if(cells2[i][x].textContent > 1000)
+                                cells2[i][x].style.fontSize = "44px";
                             if(cells2[i][x].textContent > 4)
                                 cells2[i][x].style.color = sixteenColor;
                             thing[1].push(cells2[i][x]);
@@ -328,8 +328,8 @@ function computeRowBasedOnKey(key, array, justCompute) {
                             cells2[x][i].style.backgroundColor = "blue";
                             if(cells2[x][i].textContent > 100)
                                 cells2[x][i].style.fontSize = "60px";
-                            else if(cells2[x][i].textContent > 1000)
-                                cells2[x][i].style.fontSize = "12px";
+                            if(cells2[x][i].textContent > 1000)
+                                cells2[x][i].style.fontSize = "44px";
                             if(cells2[x][i].textContent > 4)
                                 cells2[x][i].style.color = sixteenColor;
                             thing[2].push(cells2[x][i]);
@@ -379,8 +379,8 @@ function computeRowBasedOnKey(key, array, justCompute) {
                             cells2[x][i].style.backgroundColor = "blue";
                             if(cells2[x][i].textContent > 100)
                                 cells2[x][i].style.fontSize = "60px";
-                            else if(cells2[x][i].textContent > 1000)
-                                cells2[x][i].style.fontSize = "32px";
+                            if(cells2[x][i].textContent > 1000)
+                                cells2[x][i].style.fontSize = "44px";
                             if(cells2[x][i].textContent > 4)
                                 cells2[x][i].style.color = sixteenColor;
                             thing[3].push(cells2[x][i]);
