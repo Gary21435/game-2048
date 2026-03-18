@@ -1,5 +1,10 @@
-const gridSize = 600;
+const windowWidth = screen.width ?? (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
+console.log('screen', screen.width);
+const gridSize = Math.min(600, windowWidth*.9);
+console.log('windo', windowWidth);
 let squareSize = gridSize / 4.4;
+const cellStep = gridSize / 4;
+console.log('squareSize', squareSize);
 const keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
 const grid = document.querySelector(".container");
 const btn = document.querySelector(".btn");
@@ -98,6 +103,7 @@ populateGrid(); // populate grid and put 2's at i1 and i2
 console.log(cells)
 
 const two = document.querySelector("div.cell");
+two.style.fontSize = `${gridSize / 8.333}px`;
 
 let positionX = 0;
 let positionY = 0;
@@ -108,6 +114,54 @@ let positionY = 0;
 
 /* -----------------------------------------FUNCTIONS------------------------------------------- */
 let rowOneLess;
+
+const swipeArea = document.querySelector('.container');
+let touchstartX = 0;
+let touchstartY = 0;
+let touchendX = 0;
+let touchendY = 0;
+const SWIPE_THRESHOLD = 80; // Minimum distance in pixels to count as a swipe
+
+function handleGesture() {
+  const diffX = touchendX - touchstartX;
+  const diffY = touchendY - touchstartY;
+  console.log(diffX, diffY);
+  // const absDiff = Math.abs(diffX) - Math.abs(diffY);
+  let direction;
+  if (Math.abs(diffX) > SWIPE_THRESHOLD) {
+    if (diffX > 0) {
+      direction = 'ArrowRight';
+    } 
+    else {
+      direction = 'ArrowLeft';
+    }
+  }
+  else if (Math.abs(diffY) > SWIPE_THRESHOLD) {
+    if (diffY < 0) {
+      direction = 'ArrowUp';
+    } 
+    else {
+      direction = 'ArrowDown';
+    }
+  }
+  
+  if (direction)
+    handleKey(direction);
+}
+
+document.addEventListener('touchstart', e => {
+  // Use event.changedTouches[0] or event.touches[0] to get coordinates
+  touchstartX = e.changedTouches[0].screenX; 
+  touchstartY = e.changedTouches[0].screenY; 
+  console.log('touchstart');
+});
+
+document.addEventListener('touchend', e => {
+  touchendX = e.changedTouches[0].screenX;
+  touchendY = e.changedTouches[0].screenY;
+  console.log('tocuhednd');
+  handleGesture();
+});
 
 
 // Compute the array
@@ -450,10 +504,10 @@ function displayMessage(msg) { // SMTH EXTRA HAPPENS WHEN YOU HIT NEW GAME AFTER
 }
 
 const directions = {
-  ArrowLeft: [-150, 0],
-  ArrowRight: [150, 0],
-  ArrowUp: [0, -150],
-  ArrowDown: [0, 150]
+  ArrowLeft: [-cellStep, 0],
+  ArrowRight: [cellStep, 0],
+  ArrowUp: [0, -cellStep],
+  ArrowDown: [0, cellStep]
 };
 
 function translateCell(moveCell, direction, count) {
@@ -605,6 +659,7 @@ function populateGrid() { // Make and populate grid; insert two
 
       twoCell.style.width = `${gridSize / 4.4}px`;
       twoCell.style.height = `${gridSize / 4.4}px`;
+      twoCell.style.fontSize = `${gridSize / 8.333}px`;
     }
     // else {
     //     square.textContent = 0;
@@ -659,14 +714,16 @@ function handleKey(key) {
                 `);
 
       newCell.classList.add("cell");
+      newCell.style.fontSize = `${gridSize / 8.333}px`;
       newCell.textContent = 2;
 
       newCell.style.backgroundColor = "red";
-      newCell.style.width = `${600 / 4.4 - 40}px`;
-      newCell.style.height = `${600 / 4.4 - 40}px`;
+      newCell.style.width = `${squareSize - 40}px`;
+      newCell.style.height = `${squareSize - 40}px`;
+
       setTimeout(() => {
-        newCell.style.width = `${600 / 4.4}px`;
-        newCell.style.height = `${600 / 4.4}px`;
+        newCell.style.width = `${squareSize}px`;
+        newCell.style.height = `${squareSize}px`;
       }, 100);
       setTimeout(() => {
         newCell.style.backgroundColor = backgroundColors[1];
